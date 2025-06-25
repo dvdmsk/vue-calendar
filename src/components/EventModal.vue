@@ -3,6 +3,7 @@ import { computed, reactive, toRefs, watch } from "vue";
 import CloseIco from "./icons/CloseIco.vue";
 import FormCalendarIco from "./icons/FormCalendarIco.vue";
 import ClockIco from "./icons/ClockIco.vue";
+import TriangleIco from "./icons/TriangleIco.vue";
 
 interface Props {
   eventData?: {
@@ -34,19 +35,38 @@ function onSubmit() {
 }
 
 const isDateFilled = computed(() => {
-  return !!localEvent.date && localEvent.date !== '' && !localEvent.date.startsWith('0000');
+  return (
+    !!localEvent.date &&
+    localEvent.date !== "" &&
+    !localEvent.date.startsWith("0000")
+  );
 });
 
 const isTimeFilled = computed(() => {
-  return !!localEvent.time && localEvent.time !== '--:--' && localEvent.time !== '';
+  return (
+    !!localEvent.time && localEvent.time !== "--:--" && localEvent.time !== ""
+  );
 });
 
+function close() {
+  emit("cancel");
+
+  const modal = document.querySelector(".event-modal") as HTMLElement;
+  const main = document.querySelector(".main") as HTMLElement;
+
+  if (modal && main) {
+    main.style.height = `100%`;
+  }
+}
 </script>
 
 <template>
-  <div class="event-modal__backdrop" @click.self="$emit('cancel')">
+  <div class="event-modal__backdrop" @click.self="close">
     <div class="event-modal" :style="{ top: `${y}px`, left: `${x}px` }">
-      <button class="event-modal__close" @click="$emit('cancel')">
+      <div class="event-modal__triangle">
+        <TriangleIco :is-filled="!isEdit" />
+      </div>
+      <button class="event-modal__close" @click="close">
         <CloseIco />
       </button>
 
@@ -57,8 +77,6 @@ const isTimeFilled = computed(() => {
             v-model="localEvent.title"
             required
             class="event-modal__input"
-            
-            
           />
         </label>
 
@@ -110,7 +128,7 @@ const isTimeFilled = computed(() => {
           <button
             v-if="!isEdit"
             type="button"
-            @click="$emit('cancel')"
+            @click="close"
             class="event-modal__btn event-modal__btn--delete"
           >
             Cancel

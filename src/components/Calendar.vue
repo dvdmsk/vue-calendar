@@ -11,7 +11,7 @@ import type { EventClickArg, EventDropArg } from "@fullcalendar/core";
 import listPlugin from "@fullcalendar/list";
 
 import { useStore } from "vuex";
-import { computed, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import type { CalendarEvent } from "@/store";
 import EventModal from "./EventModal.vue";
 
@@ -91,46 +91,52 @@ function handleEventClick(arg: EventClickArg) {
     time: event.startStr.slice(11, 16),
     notes: event.extendedProps.notes || "",
   };
+  console.log(arg);
   openModalAt(arg.jsEvent);
 }
 
 function openModalAt(event: MouseEvent) {
+  if (document.querySelector(".event-modal")) {
+    return;
+  }
+
   const calendarElement = document.querySelector(".calendar") as HTMLElement;
+  const modalWidth = 201;
   const calendarRect = calendarElement?.getBoundingClientRect();
-  const targetCell = (event.target as HTMLElement).closest("td, .fc-daygrid-day-frame") as HTMLElement;
+  const targetCell = (event.target as HTMLElement).closest(
+    "td, .fc-daygrid-day-frame"
+  ) as HTMLElement;
+
   const cellRect = targetCell?.getBoundingClientRect();
-
-  const tempModal = document.createElement("div");
-  tempModal.className = "event-modal";
-  tempModal.style.position = "absolute";
-  tempModal.style.visibility = "hidden";
-  document.body.appendChild(tempModal);
-  const modalWidth = tempModal.offsetWidth || 270;
-
-  tempModal.remove();
-
+  const main = document.querySelector(".main") as HTMLElement;
   const margin = 10;
 
   let x = event.clientX;
-  const y = event.clientY;
+  let y = event.clientY;
 
   if (cellRect && calendarRect) {
     const cellWidth = cellRect.width;
-    x = cellRect.left + (cellWidth / 2) - (modalWidth / 2);
-
-    const maxX = calendarRect.right - modalWidth - margin;
-    const minX = calendarRect.left + margin;
-    x = Math.min(Math.max(x, minX), maxX);
+    x = cellRect.left - (modalWidth - cellWidth) / 2;
+    y = cellRect.top + cellRect.height + 10;
   }
 
   modalX.value = x;
-  modalY.value = y;
+  modalY.value = y + window.scrollY;
   showModal.value = true;
+  const bottomMain = main.getBoundingClientRect().top + main.offsetHeight + window.scrollY;
 
+  nextTick(() => {
+    const modal = document.querySelector(".event-modal") as HTMLElement;
 
+    if (modal && main) {
+      const bottomModal =
+        modal.getBoundingClientRect().top + modal.offsetHeight + window.scrollY;
+      const delta = bottomModal - bottomMain;
+
+      main.style.height = (delta > 0) ? `${main.offsetHeight + delta}px` : '100%';
+    }
+  });
 }
-
-
 
 function handleModalSave(payload: any) {
   const event = {

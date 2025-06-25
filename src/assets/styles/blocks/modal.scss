@@ -16,6 +16,14 @@
     z-index: 1000;
   }
 
+  &__triangle {
+    position: absolute;
+    display: flex;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
   &__close {
     position: absolute;
     top: 12px;
@@ -59,6 +67,7 @@
   }
 
   &__textarea {
+    height: 22.5px;
     resize: none;
     overflow: hidden;
   }
