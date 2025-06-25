@@ -117,7 +117,6 @@ function openModalAt(event: MouseEvent) {
   if (cellRect && calendarRect) {
     const cellWidth = cellRect.width;
     x = cellRect.left - (modalWidth - cellWidth) / 2;
-    y = cellRect.top + cellRect.height + 10;
   }
 
   modalX.value = x;
