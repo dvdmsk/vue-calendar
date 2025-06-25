@@ -1,0 +1,19 @@
+.search {
+  position: relative;
+
+  &__ico {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+  }
+
+  &__input {
+    font-size: 13px;
+    line-height: 20px;
+    color: #4d4f5c;
+    padding: 10px 10px 10px 31px;
+    border: none;
+    width: 254px;
+  }
+}
